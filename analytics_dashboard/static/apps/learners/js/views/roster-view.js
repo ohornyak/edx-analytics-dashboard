@@ -151,8 +151,12 @@ define([
             formatter: {
                 fromRaw: function (rawData, model) {
                     var value = model.get('engagements')[key];
-                    // Translators: 'N/A' is an abbreviation of "Not Applicable". Please translate accordingly.
-                    return value === null ? gettext('N/A') : value;
+                    if (_(value).isNull()) {
+                        // Translators: 'N/A' is an abbreviation of "Not Applicable". Please translate accordingly.
+                        return gettext('N/A');
+                    } else {
+                        return Utils.localizeNumber(value, options.significantDigits);
+                    }
                 }
             },
 
@@ -388,6 +392,9 @@ define([
                         column.cell = NameAndUsernameCell;
                         column.headerCell = BaseHeaderCell;
                     } else {
+                        options = _.defaults({
+                            significantDigits: key === 'problem_attempts_per_completed' ? 1 : 0
+                        }, options);
                         column.cell = createEngagementCell(key, options);
                         column.headerCell = createEngagementHeaderCell(key);
                     }
